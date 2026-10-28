@@ -55,6 +55,28 @@ PCSCHAIR_TARGETS="flask=http://localhost:3000,rails=http://localhost:3001" \
 
 `PCSCHAIR_TARGETS` defaults to Flask alone. Set `HEADED=1` to watch the browser.
 
+## Stress testing
+
+`stress/stress.py` simulates a large meeting to size the Heroku resources.
+Simulated attendees are spread across venues; each loads the venue page and holds
+a websocket. Each venue's chair makes a new paper active every ~20 seconds, the way
+the extension does. Load increases in steps, and each step reports:
+- how many attendees stayed connected
+- the share of chair updates that reached them, and how quickly (p50/p95/max)
+- how long the chair's update request took
+- socket round-trip time
+
+```sh
+uv run --group stress python stress/stress.py \
+  --url https://pcschair-staging-e00ae72137b0.herokuapp.com \
+  --venues 22 --steps 100,250,500,750,1000,1500 --output results.json
+```
+
+Run it against staging, scaled to the dyno type being evaluated, and never against
+production during a meeting. The tool creates "Stress test N" venues on the target
+(or reuses them via `--venue-ids`). A warning about the load generator falling
+behind means the measuring machine, not the server, was the bottleneck.
+
 ## Configuration
 
 | Variable | Purpose |
