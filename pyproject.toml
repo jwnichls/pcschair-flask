@@ -12,6 +12,7 @@ dependencies = [
     "simple-websocket>=1.0",
     "gunicorn>=22.0",
     "psycopg[binary]>=3.1",
+    "gevent>=24.2",
 ]
 
 [project.optional-dependencies]

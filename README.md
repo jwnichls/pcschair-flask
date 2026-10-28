@@ -88,10 +88,10 @@ behind means the measuring machine, not the server, was the bottleneck.
 ## Deployment
 
 ```sh
-gunicorn --workers 1 --threads 100 --bind 0.0.0.0:$PORT app:app
+gunicorn --worker-class gevent --workers 1 --worker-connections 3000 --bind 0.0.0.0:$PORT app:app
 ```
 
-One worker with many threads handles websockets with no extra infrastructure. To run
+One gevent worker holds thousands of websockets in a single process (the threaded worker hit Heroku's per-dyno thread limit at about 100 users). To run
 multiple workers or dynos, set `SOCKETIO_MESSAGE_QUEUE` to a Redis URL so broadcasts
 reach every process. The client uses only the websocket transport, so sticky sessions
 aren't required.

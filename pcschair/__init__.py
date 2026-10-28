@@ -14,6 +14,19 @@ def database_url():
     return url
 
 
+def socketio_async_mode():
+    """gevent under gunicorn's gevent worker (production); threads for the dev server and tests.
+
+    The threaded mode holds OS threads per connection, which hits Heroku's
+    per-dyno thread limit at about 100 attendees; gevent handles thousands.
+    """
+    try:
+        from gevent import monkey
+    except ImportError:
+        return "threading"
+    return "gevent" if monkey.is_module_patched("socket") else "threading"
+
+
 def create_app(config=None):
     app = Flask(__name__)
     app.config.from_mapping(
@@ -31,7 +44,7 @@ def create_app(config=None):
     db.init_app(app)
     socketio.init_app(
         app,
-        async_mode="threading",
+        async_mode=socketio_async_mode(),
         message_queue=app.config["SOCKETIO_MESSAGE_QUEUE"],
     )
     app.register_blueprint(views.bp)
