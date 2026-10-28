@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>{{ "Editing venue" if venue.id else "New venue" }}</h1>
+
+{% if error %}
+<div id="error_explanation">
+  <h2>This venue could not be saved:</h2>
+  <ul><li>{{ error }}</li></ul>
+</div>
+{% endif %}
+
+<form method="post" action="{{ url_for('main.edit_venue', venue_id=venue.id) if venue.id else url_for('main.new_venue') }}">
+  <div class="field">
+    <label for="name">Name</label><br>
+    <input type="text" id="name" name="name" value="{{ venue.name or '' }}">
+  </div>
+  <div class="field">
+    <label for="allow_adds">Allow adds</label><br>
+    <input type="checkbox" id="allow_adds" name="allow_adds" {{ "checked" if venue.allow_adds }}>
+  </div>
+  <div class="field">
+    <label for="pcs2_flag">Pcs2 flag</label><br>
+    <input type="checkbox" id="pcs2_flag" name="pcs2_flag" {{ "checked" if venue.pcs2_flag }}>
+  </div>
+  <div class="field">
+    <label for="pcs2_venue_name">Pcs2 venue name</label><br>
+    <input type="text" id="pcs2_venue_name" name="pcs2_venue_name" value="{{ venue.pcs2_venue_name or '' }}">
+  </div>
+  <div class="field">
+    <label for="sub_committee">Sub committee</label><br>
+    <input type="checkbox" id="sub_committee" name="sub_committee" {{ "checked" if venue.sub_committee }}>
+  </div>
+  <div class="field">
+    <label for="sub_committee_id">Sub committee ID</label><br>
+    <input type="text" id="sub_committee_id" name="sub_committee_id" value="{{ venue.sub_committee_id if venue.sub_committee_id is not none else 0 }}">
+  </div>
+  <div class="actions">
+    <button type="submit">{{ "Update Venue" if venue.id else "Create Venue" }}</button>
+  </div>
+</form>
+
+{% if venue.id %}
+<a href="{{ url_for('main.venue', venue_id=venue.id) }}">Show</a>
+{% endif %}
+{% endblock %}

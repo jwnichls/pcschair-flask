@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{# Shared shell for the attendee and admin views; the page body is rendered client-side from pushed state. #}
+
+{% block content %}
+<main>
+  {% with messages = get_flashed_messages() %}
+  <p id="notice">{{ messages | join(" ") }}</p>
+  {% endwith %}
+
+  <div id="connection-status" class="alert alert-warning hidden" role="status">
+    Connection to the server lost. Reconnecting&hellip;
+  </div>
+  <div id="action-error" class="alert alert-danger hidden" role="alert"></div>
+
+  {% block venue_content %}{% endblock %}
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.min.js"></script>
+<script>
+  window.PCSCHAIR = {
+    venueId: {{ venue.id | string | tojson }},
+    admin: {{ admin | tojson }},
+    initialState: {{ state | tojson }},
+    sounds: {
+      notify: {{ url_for('static', filename='audio/alert.mp3') | tojson }},
+      timer: {{ url_for('static', filename='audio/roar1.m4a') | tojson }}
+    }
+  };
+</script>
+<script src="{{ url_for('static', filename='js/venue.js') }}"></script>
+{% endblock %}

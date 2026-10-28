@@ -1,0 +1,54 @@
+{% extends "_venue_page.html" %}
+
+{% block venue_content %}
+<div class="invisible">
+  <span id="pcs2flag"></span>
+  <span id="pcs2venueName"></span>
+</div>
+
+<h1 id="venue-name">{{ venue.name }}</h1>
+
+<div id="controls" role="region" aria-label="Controls">
+  <label for="volumeRange">Volume:</label> <input id="volumeRange" type="range" min="0.0" max="1.0" step="0.01" value="0.5">
+</div>
+
+<div id="break" class="row invisible">
+  <h2>Currently on Break</h2>
+</div>
+<div id="main" class="row mainrow rowspace50">
+  <div class="col-md-4" id="timer" role="region" aria-label="Timer">0:00</div>
+  <div class="col-md-8" id="paper-info" role="region" aria-label="Paper Information"></div>
+</div>
+<div class="row rowspace50">
+  <div class="col-md-6" role="region" aria-label="Upcoming Papers">
+    <h3>Upcoming Papers: (<span id="queue-count">0</span>)</h3>
+    <ul id="paper-queue"></ul>
+    <p id="add-paper" role="region" aria-label="Add a paper to upcoming list">
+      <label for="newPaperId">Add A Paper:</label>
+      <input type="text" id="newPaperId">
+      <button id="addNewPaper">Add</button>
+    </p>
+  </div>
+  <div class="col-md-6" role="region" aria-label="Highlight your AC papers">
+    <h3>Highlight Your AC Papers</h3>
+    <p>
+      Adding paper IDs to the list below will cause the corresponding IDs
+      to be highlighted in the upcoming papers list.  This makes it easier
+      to see when your papers are coming up.
+    </p>
+    <p>
+      <b>Please Note:</b> This list of ID numbers is stored locally in your
+      browser and nowhere else.  The web server has no knowledge of what you
+      enter here.  If you are still concerned, please don't use this
+      feature.
+    </p>
+    <p role="region" aria-label="Manage papers in AC list">
+      <label for="acPaperId">Add an AC Paper:</label>
+      <input type="text" id="acPaperId">
+      <button id="addACPaper">Add</button>
+      <button id="clearAllACPapers">Clear All AC Papers</button>
+    </p>
+    <ul id="acPaperList"></ul>
+  </div>
+</div>
+{% endblock %}

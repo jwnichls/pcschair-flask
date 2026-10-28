@@ -1,0 +1,41 @@
+# Runs the original Rails implementation for the parity tests, on http://localhost:3001.
+#
+#   docker-compose -f parity/rails/docker-compose.yml up -d
+#
+# The Rails checkout (../pcschair by default, override with PCSCHAIR_RAILS_SRC)
+# is mounted read-only and copied inside the container, so it is never modified.
+services:
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: pcschairassist
+      POSTGRES_PASSWORD: gimlet
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "pcschairassist"]
+      interval: 2s
+      retries: 30
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  rails:
+    image: ruby:2.7.4
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:3001:3000"
+    environment:
+      DATABASE_URL: postgres://pcschairassist:gimlet@db/pcschairassist_development
+      RAILS_ENV: development
+      BUNDLE_PATH: /bundle
+    volumes:
+      - ${PCSCHAIR_RAILS_SRC:-../../../pcschair}:/src:ro
+      - ./start.sh:/start.sh:ro
+      - bundle:/bundle
+      - node:/opt/node
+    command: ["bash", "/start.sh"]
+
+volumes:
+  pgdata:
+  bundle:
+  node:

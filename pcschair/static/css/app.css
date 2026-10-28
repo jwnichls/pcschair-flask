@@ -1,0 +1,189 @@
+/* Ported from the Rails app's scaffolds.css.scss and snootybird.scss.erb */
+
+body {
+  background-color: #fff;
+  color: #333;
+  font-family: verdana, arial, helvetica, sans-serif;
+  font-size: 13px;
+  line-height: 18px;
+}
+
+p, ol, ul, td {
+  font-family: verdana, arial, helvetica, sans-serif;
+  font-size: 13px;
+  line-height: 18px;
+}
+
+div.field, div.actions {
+  margin-bottom: 10px;
+}
+
+#notice {
+  color: green;
+}
+
+#error_explanation {
+  width: 450px;
+  border: 2px solid red;
+  padding: 7px;
+  padding-bottom: 0;
+  margin-bottom: 20px;
+  background-color: #f0f0f0;
+}
+
+#error_explanation h2 {
+  text-align: left;
+  font-weight: bold;
+  padding: 5px 5px 5px 15px;
+  font-size: 12px;
+  margin: -7px;
+  margin-bottom: 0;
+  background-color: #c00;
+  color: #fff;
+}
+
+#error_explanation ul li {
+  font-size: 12px;
+  list-style: square;
+}
+
+/* Queue controls: image-only buttons */
+.control {
+  height: 12px;
+  width: 12px;
+  border: 0;
+  padding: 0;
+  display: inline-block;
+  vertical-align: middle;
+  background-size: 12px;
+}
+
+button.control {
+  cursor: pointer;
+}
+
+.clearimg {
+  background: url("../images/clear.jpg");
+  background-size: 12px;
+}
+
+.downimg {
+  background: url("../images/down.jpg");
+  background-size: 12px;
+}
+
+.upimg {
+  background: url("../images/up.jpg");
+  background-size: 12px;
+}
+
+.removeimg {
+  background: url("../images/remove.jpg");
+  background-size: 12px;
+}
+
+div.mainrow {
+  min-height: 10em;
+}
+
+#timer {
+  font-family: "Helvetica", sans-serif;
+  font-size: 6em;
+  font-weight: bold;
+  text-align: center;
+  line-height: 1.1;
+}
+
+p.no-active-paper {
+  font-family: "Helvetica", sans-serif;
+  font-size: 1.5em;
+  font-weight: bold;
+  text-align: center;
+}
+
+p.paper-id {
+  font-family: "Helvetica", sans-serif;
+  font-size: 1.5em;
+  font-weight: bold;
+  text-align: center;
+  color: rgb(150, 150, 150);
+}
+
+p.paper-title {
+  font-family: "Helvetica", sans-serif;
+  font-size: 2em;
+  font-weight: bold;
+  text-align: center;
+  line-height: 1.25em;
+}
+
+ul.paper-authors {
+  padding-top: 25px !important;
+}
+
+li.author {
+  font-family: "Helvetica", sans-serif;
+  font-size: 1.25em;
+  font-weight: normal;
+}
+
+li.paper {
+  list-style-type: none;
+  font-family: "Helvetica", sans-serif;
+  font-size: 2.5em;
+  font-weight: normal;
+  line-height: 1.2;
+}
+
+li.acPaper {
+  font-weight: bold !important;
+}
+
+div.rowspace50 {
+  padding-top: 50px !important;
+}
+
+div.rowspace25 {
+  padding-top: 25px !important;
+}
+
+.expired {
+  color: rgb(200, 0, 0);
+}
+
+div.invisible {
+  display: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: #222;
+    color: #ccc;
+  }
+  input, button {
+    background-color: #222;
+    color: #ccc;
+  }
+  a {
+    color: #8ecbff;
+  }
+  .expired {
+    color: rgb(255, 100, 100) !important;
+  }
+  .clearimg {
+    background: url("../images/clear_dark.jpg") !important;
+    background-size: 12px !important;
+  }
+  .downimg {
+    background: url("../images/down_dark.jpg") !important;
+    background-size: 12px !important;
+  }
+  .upimg {
+    background: url("../images/up_dark.jpg") !important;
+    background-size: 12px !important;
+  }
+  .removeimg {
+    background: url("../images/remove_dark.jpg") !important;
+    background-size: 12px !important;
+  }
+}

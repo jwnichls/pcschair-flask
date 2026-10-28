@@ -1,0 +1,31 @@
+[project]
+name = "pcschair"
+version = "0.1.0"
+description = "PCS Chairing Assistant: a live timer and paper queue for program committee meetings"
+readme = "README.md"
+license = "BSD-3-Clause"
+requires-python = ">=3.13"
+dependencies = [
+    "flask>=3.0",
+    "flask-sqlalchemy>=3.1",
+    "flask-socketio>=5.3",
+    "simple-websocket>=1.0",
+    "gunicorn>=22.0",
+    "psycopg[binary]>=3.1",
+]
+
+[project.optional-dependencies]
+redis = ["redis>=5.0"]
+
+[dependency-groups]
+dev = ["pytest>=8.0"]
+parity = [
+    "playwright>=1.64.1",
+]
+
+[tool.uv]
+package = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
