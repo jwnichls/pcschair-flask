@@ -72,7 +72,8 @@ uv run --group stress python stress/stress.py \
   --venues 22 --steps 100,250,500,750,1000,1500 --output results.json
 ```
 
-Run it against staging, scaled to the dyno type being evaluated, and never against
+Attendees are spread over several processes (`--processes`, default up to 8) so the
+measuring machine keeps up. Run it against staging, scaled to the dyno type being evaluated, and never against
 production during a meeting. The tool creates "Stress test N" venues on the target
 (or reuses them via `--venue-ids`). A warning about the load generator falling
 behind means the measuring machine, not the server, was the bottleneck.
