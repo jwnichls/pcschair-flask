@@ -733,6 +733,7 @@ dependencies = [
     { name = "flask-sqlalchemy" },
     { name = "gevent" },
     { name = "gunicorn" },
+    { name = "packaging" },
     { name = "psycopg", extra = ["binary"] },
     { name = "simple-websocket" },
 ]
@@ -761,6 +762,7 @@ requires-dist = [
     { name = "flask-sqlalchemy", specifier = ">=3.1" },
     { name = "gevent", specifier = ">=24.2" },
     { name = "gunicorn", specifier = ">=22.0" },
+    { name = "packaging", specifier = ">=24" },
     { name = "psycopg", extras = ["binary"], specifier = ">=3.1" },
     { name = "redis", marker = "extra == 'redis'", specifier = ">=5.0" },
     { name = "simple-websocket", specifier = ">=1.0" },
