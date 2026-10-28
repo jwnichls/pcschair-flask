@@ -383,10 +383,13 @@
   } else {
     onClick("addACPaper", function () {
       var input = byId("acPaperId");
-      var paperId = readInt(input);
-      if (paperId !== null) {
+      // Accept several IDs at once, separated by spaces, commas or anything else.
+      var paperIds = (input.value.match(/\d+/g) || []).map(function (id) { return parseInt(id, 10); });
+      if (paperIds.length) {
         var acPapers = getACPapers();
-        if (acPapers.indexOf(paperId) < 0) acPapers.push(paperId);
+        paperIds.forEach(function (paperId) {
+          if (acPapers.indexOf(paperId) < 0) acPapers.push(paperId);
+        });
         setACPapers(acPapers);
         input.value = "";
       }
