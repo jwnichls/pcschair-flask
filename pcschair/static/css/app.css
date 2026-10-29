@@ -47,6 +47,78 @@ div.field, div.actions {
   list-style: square;
 }
 
+/* Venue form and list */
+.venue-form {
+  max-width: 680px;
+  margin-bottom: 40px;
+}
+
+.venue-form .form-group {
+  margin-bottom: 28px;
+}
+
+.field-help {
+  display: block;
+  margin-top: 5px;
+  margin-bottom: 10px;
+  color: #737373;
+}
+
+.field-help p {
+  margin-bottom: 10px;
+}
+
+.sponsor-input {
+  max-width: 320px;
+}
+
+.pcs-name-input {
+  max-width: 220px;
+}
+
+.pcs-url-figure {
+  margin: 0;
+}
+
+.pcs-url-figure img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+}
+
+.pcs-url-figure figcaption {
+  margin-top: 6px;
+}
+
+.field-error {
+  font-weight: bold;
+}
+
+.form-actions .btn-primary {
+  margin-right: 8px;
+}
+
+.venue-links {
+  word-break: break-all;
+}
+
+.venue-actions {
+  white-space: nowrap;
+}
+
+.venue-actions a, .venue-actions form {
+  display: inline-block;
+  margin-right: 10px;
+}
+
+.venue-actions .btn-link {
+  padding: 0;
+  vertical-align: baseline;
+  font-size: inherit;
+}
+
 /* Queue controls: image-only buttons */
 .control {
   height: 12px;
@@ -160,9 +232,29 @@ div.invisible {
     background-color: #222;
     color: #ccc;
   }
-  input, button {
+  input, button, .form-control {
     background-color: #222;
     color: #ccc;
+  }
+  .form-control {
+    border-color: #555;
+  }
+  button.btn-primary {
+    background-color: #337ab7;
+    color: #fff;
+  }
+  .field-help, .text-muted {
+    color: #999;
+  }
+  code {
+    background-color: #3a2a30;
+    color: #f5a3c0;
+  }
+  .pcs-url-figure img {
+    border-color: #555;
+  }
+  .table > thead > tr > th, .table > tbody > tr > td {
+    border-color: #444;
   }
   a {
     color: #8ecbff;

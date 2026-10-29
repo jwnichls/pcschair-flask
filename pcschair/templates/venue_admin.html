@@ -3,6 +3,10 @@
 
 {% block venue_content %}
 <h1>ADMIN VIEW: <span id="venue-name">{{ venue.name }}</span></h1>
+<p class="venue-links">
+  Committee members' page: <a href="{{ url_for('main.venue', venue_id=venue.id) }}">{{ url_for('main.venue', venue_id=venue.id, _external=True) }}</a>
+  &middot; <a href="{{ url_for('main.edit_venue', venue_id=venue.id) }}">Venue settings</a>
+</p>
 
 <div id="scalert" class="alert alert-danger hidden" role="alert">
   <h2>Information Needed</h2>

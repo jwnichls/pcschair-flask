@@ -92,20 +92,26 @@ class Site:
         # Rails names fields venue[name] (plus hidden inputs for checkboxes); Flask uses bare names.
         return page.locator(f'input[name="venue[{name}]"]:not([type=hidden]), input[name="{name}"]')
 
-    def create_venue(self, name=None, allow_adds=True, pcs2_flag=False, pcs2_venue_name="",
+    def create_venue(self, name=None, allow_adds=True, pcs2_flag=True, pcs2_venue_name="chi27a",
                      sub_committee=False):
-        """Create a venue through /venues/new. Returns (venue_id, notice text)."""
+        """Create a venue through /venues/new. Returns (venue_id, notice text).
+
+        Flask's form is PCS2-only (no pcs2_flag field), so Rails gets pcs2_flag checked too.
+        """
         name = name or f"Parity {uuid.uuid4().hex[:8]}"
         page = self.new_page()
         page.goto("/venues/new")
         self._field(page, "name").fill(name)
         self._field(page, "allow_adds").set_checked(allow_adds)
-        self._field(page, "pcs2_flag").set_checked(pcs2_flag)
+        pcs2_field = self._field(page, "pcs2_flag")
+        if pcs2_field.count():
+            pcs2_field.set_checked(pcs2_flag)
         self._field(page, "pcs2_venue_name").fill(pcs2_venue_name)
         self._field(page, "sub_committee").set_checked(sub_committee)
         page.get_by_role("button", name="Create Venue").click()
-        page.wait_for_url(re.compile(r"/venues/[0-9a-f-]{36}$"))
-        venue_id = page.url.rsplit("/", 1)[1]
+        # Rails shows the attendee page after creating; Flask shows the chair page.
+        page.wait_for_url(re.compile(r"/venues/[0-9a-f-]{36}(/admin)?$"))
+        venue_id = re.search(r"/venues/([0-9a-f-]{36})", page.url).group(1)
         notice = page.locator("#notice").inner_text().strip()
         page.context.close()
         return venue_id, notice

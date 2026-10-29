@@ -57,20 +57,98 @@ def test_pages_render(client, venue_id):
 
 
 def test_create_and_edit_venue(client):
-    resp = client.post("/venues/new", data={"name": "UIST", "allow_adds": "on", "sub_committee_id": "3"})
+    resp = client.post("/venues/new", data={"name": "UIST", "allow_adds": "on", "pcs2_venue_name": " UIST27A "})
     assert resp.status_code == 302
-    venue_id = resp.headers["Location"].rsplit("/", 1)[1]
+    venue_id = resp.headers["Location"].split("/")[2]
+    assert resp.headers["Location"].endswith("/admin")
     data = client.get(f"/venues/{venue_id}.json").get_json()
     assert data["name"] == "UIST"
     assert data["allow_adds"] is True
-    assert data["pcs2_flag"] is False
-    assert data["sub_committee_id"] == 3
+    assert data["pcs2_flag"] is True
+    assert data["pcs2_venue_name"] == "uist27a"
+    assert data["sub_committee"] is False
+    assert data["sub_committee_id"] == 0
 
-    client.post(f"/venues/{venue_id}/edit", data={"name": "UIST 2027", "pcs2_flag": "on"})
+    client.post(f"/venues/{venue_id}/edit", data={"name": "UIST 2027", "pcs2_venue_name": "uist27a"})
     data = client.get(f"/venues/{venue_id}.json").get_json()
     assert data["name"] == "UIST 2027"
-    assert data["pcs2_flag"] is True
     assert data["allow_adds"] is False
+
+
+def test_create_venue_accepts_pasted_pcs_url(client):
+    resp = client.post("/venues/new", data={
+        "name": "CHI", "pcs2_venue_name": "https://new.precisionconference.com/chi27b/subchair16/subs/1234",
+    })
+    venue_id = resp.headers["Location"].split("/")[2]
+    assert client.get(f"/venues/{venue_id}.json").get_json()["pcs2_venue_name"] == "chi27b"
+
+
+def test_create_venue_validates_fields(client):
+    resp = client.post("/venues/new", data={"name": "  ", "pcs2_venue_name": ""})
+    assert resp.status_code == 422
+    assert b"Enter a name for your meeting." in resp.data
+    assert b"Enter your PCS venue name." in resp.data
+
+    resp = client.post("/venues/new", data={"name": "CHI", "pcs2_venue_name": "chi2027"})
+    assert resp.status_code == 422
+    assert b"look like a PCS venue name" in resp.data
+    assert b'value="CHI"' in resp.data  # entered values are kept
+
+
+def test_subcommittee_id_is_requested_on_admin_page(client):
+    resp = client.post("/venues/new", data={"name": "CHI SC", "pcs2_venue_name": "chi27a", "sub_committee": "on"})
+    venue_id = resp.headers["Location"].split("/")[2]
+    assert client.get(f"/venues/{venue_id}.json").get_json()["sub_committee_id"] == -1
+
+    # An ID the chair has since entered survives editing; turning subcommittees off clears it.
+    client.put(f"/venues/{venue_id}.json", json={"venue": {"sub_committee_id": 16}})
+    form = {"name": "CHI SC", "pcs2_venue_name": "chi27a", "sub_committee": "on"}
+    client.post(f"/venues/{venue_id}/edit", data=form)
+    assert client.get(f"/venues/{venue_id}.json").get_json()["sub_committee_id"] == 16
+    del form["sub_committee"]
+    client.post(f"/venues/{venue_id}/edit", data=form)
+    data = client.get(f"/venues/{venue_id}.json").get_json()
+    assert (data["sub_committee"], data["sub_committee_id"]) == (False, 0)
+
+
+def test_venue_creation_asks_sponsor_question(app, client):
+    app.config.update(VENUE_SPONSOR_ANSWERS="ACM, ieee")
+    form = {"name": "UIST", "pcs2_venue_name": "uist27a"}
+
+    resp = client.get("/venues/new")
+    assert b"What entity sponsors" in resp.data
+    assert b'name="pcs2_venue_name"' not in resp.data
+    assert client.post("/venues/new", data=form).status_code == 403
+
+    resp = client.post("/venues/new/check", data={"answer": "Springer"})
+    assert resp.status_code == 403
+    assert b"wasn't recognized" in resp.data
+    assert client.get("/venues/new").data.count(b"What entity sponsors") == 1
+
+    resp = client.post("/venues/new/check", data={"answer": " The acm "})
+    assert resp.headers["Location"] == "/venues/new"
+    assert b'name="pcs2_venue_name"' in client.get("/venues/new").data
+    assert client.post("/venues/new", data=form).status_code == 302
+
+
+def test_venue_list_requires_configured_login(app, client, venue_id):
+    assert client.get("/venues").status_code == 404  # disabled until credentials are set
+
+    app.config.update(VENUES_USERNAME="admin", VENUES_PASSWORD="s3cret")
+    resp = client.get("/venues/")
+    assert resp.status_code == 401
+    assert resp.headers["WWW-Authenticate"].startswith("Basic")
+    assert client.get("/venues", auth=("admin", "wrong")).status_code == 401
+    assert client.post(f"/venues/{venue_id}/delete").status_code == 401
+
+    resp = client.get("/venues/", auth=("admin", "s3cret"))
+    assert resp.status_code == 200
+    assert b"CHI PC" in resp.data
+
+    client.post(f"/venues/{venue_id}/addpaper", json={"pcs_id": 101})
+    resp = client.post(f"/venues/{venue_id}/delete", auth=("admin", "s3cret"))
+    assert resp.status_code == 302
+    assert client.get(f"/venues/{venue_id}.json").status_code == 404
 
 
 def test_venue_json_matches_rails_shape(client, venue_id):

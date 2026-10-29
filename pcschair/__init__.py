@@ -34,6 +34,12 @@ def create_app(config=None):
         SQLALCHEMY_DATABASE_URI=database_url(),
         # Set to a Redis URL to broadcast across multiple server processes.
         SOCKETIO_MESSAGE_QUEUE=os.environ.get("SOCKETIO_MESSAGE_QUEUE"),
+        # Login for the venue list at /venues; the list is disabled unless both are set.
+        VENUES_USERNAME=os.environ.get("VENUES_USERNAME"),
+        VENUES_PASSWORD=os.environ.get("VENUES_PASSWORD"),
+        # Comma-separated one-word answers to the question asked before creating a venue.
+        # Unset, anyone can create venues.
+        VENUE_SPONSOR_ANSWERS=os.environ.get("VENUE_SPONSOR_ANSWERS"),
     )
     if config:
         app.config.update(config)

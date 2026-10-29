@@ -1,46 +1,171 @@
 {% extends "base.html" %}
 
+{% macro value(field) -%}
+  {{ form[field] if form else (venue[field] or '') }}
+{%- endmacro %}
+
+{% macro checked(field) -%}
+  {{ "checked" if (field in form if form else venue[field]) }}
+{%- endmacro %}
+
+{% macro field_error(field) -%}
+  {% if errors and errors[field] %}<p class="help-block field-error" id="{{ field }}-error">{{ errors[field] }}</p>{% endif %}
+{%- endmacro %}
+
 {% block content %}
-<h1>{{ "Editing venue" if venue.id else "New venue" }}</h1>
+<div class="venue-form">
+  <h1>{{ "Edit venue" if venue.id else "Create a venue" }}</h1>
 
-{% if error %}
-<div id="error_explanation">
-  <h2>This venue could not be saved:</h2>
-  <ul><li>{{ error }}</li></ul>
+  {% if not venue.id %}
+  <p class="lead">
+    A venue is the shared page for one program committee meeting. It shows everyone
+    the paper being discussed, the timer, and the papers coming up next.
+  </p>
+  {% endif %}
+
+  {% if errors %}
+  <div class="alert alert-danger" role="alert">
+    <strong>Please fix the {{ "problem" if errors | length == 1 else "problems" }} below.</strong>
+  </div>
+  {% endif %}
+
+  <form method="post" novalidate
+        action="{{ url_for('main.edit_venue', venue_id=venue.id) if venue.id else url_for('main.new_venue') }}">
+
+    <div class="form-group {{ 'has-error' if errors and errors.name }}">
+      <label class="control-label" for="name">Meeting name</label>
+      <input type="text" class="form-control" id="name" name="name" value="{{ value('name') }}"
+             required maxlength="200" placeholder="e.g. CHI 2027 PC Meeting"
+             aria-describedby="name-help{{ ' name-error' if errors and errors.name }}">
+      <p class="field-help" id="name-help">Shown at the top of the attendee and chair pages.</p>
+      {{ field_error("name") }}
+    </div>
+
+    <div class="form-group {{ 'has-error' if errors and errors.pcs2_venue_name }}">
+      <label class="control-label" for="pcs2_venue_name">PCS venue name</label>
+      <input type="text" class="form-control pcs-name-input" id="pcs2_venue_name" name="pcs2_venue_name"
+             value="{{ value('pcs2_venue_name') }}" required
+             pattern="[A-Za-z]+[0-9]{2}[A-Za-z]" placeholder="e.g. chi27a"
+             autocapitalize="off" autocorrect="off" spellcheck="false"
+             aria-describedby="pcs-help{{ ' pcs2_venue_name-error' if errors and errors.pcs2_venue_name }}">
+      <div class="field-help" id="pcs-help">
+        <p>
+          Paper numbers link to their PCS pages, so we need your venue's name in PCS. It's
+          the part of the address right after <code>new.precisionconference.com/</code>
+          when you're signed in to PCS for your conference. You can also paste a whole PCS
+          address here and we'll pick the name out of it.
+        </p>
+        <figure class="pcs-url-figure">
+          <img src="{{ url_for('static', filename='images/pcs-url.png') }}" width="640" height="88"
+               alt="A browser address bar showing new.precisionconference.com/chi27a/chair/submissions, with chi27a highlighted as the venue name.">
+          <figcaption>In this example the PCS venue name is <strong>chi27a</strong>.</figcaption>
+        </figure>
+      </div>
+      {{ field_error("pcs2_venue_name") }}
+    </div>
+
+    <div class="form-group">
+      <div class="checkbox">
+        <label>
+          <input type="checkbox" id="sub_committee" name="sub_committee" {{ checked("sub_committee") }}
+                 aria-describedby="sub_committee-help">
+          This meeting is split into subcommittees
+        </label>
+      </div>
+      <p class="field-help" id="sub_committee-help">
+        For example, CHI's subcommittee meetings. After you create the venue, the chair page
+        will ask for your subcommittee's PCS ID so paper links open the right page.
+      </p>
+    </div>
+
+    <div class="form-group">
+      <div class="checkbox">
+        <label>
+          <input type="checkbox" id="allow_adds" name="allow_adds" {{ checked("allow_adds") }}
+                 aria-describedby="allow_adds-help">
+          Let committee members add papers to the upcoming list
+        </label>
+      </div>
+      <p class="field-help" id="allow_adds-help">
+        Useful when members ask to discuss a paper. You can change this anytime from the chair page.
+      </p>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">{{ "Save Changes" if venue.id else "Create Venue" }}</button>
+      {% if venue.id %}
+      <a class="btn btn-link" href="{{ url_for('main.admin', venue_id=venue.id) }}">Cancel</a>
+      {% else %}
+      <a class="btn btn-link" href="{{ url_for('main.index') }}">Cancel</a>
+      {% endif %}
+    </div>
+  </form>
 </div>
-{% endif %}
+{% endblock %}
 
-<form method="post" action="{{ url_for('main.edit_venue', venue_id=venue.id) if venue.id else url_for('main.new_venue') }}">
-  <div class="field">
-    <label for="name">Name</label><br>
-    <input type="text" id="name" name="name" value="{{ venue.name or '' }}">
-  </div>
-  <div class="field">
-    <label for="allow_adds">Allow adds</label><br>
-    <input type="checkbox" id="allow_adds" name="allow_adds" {{ "checked" if venue.allow_adds }}>
-  </div>
-  <div class="field">
-    <label for="pcs2_flag">Pcs2 flag</label><br>
-    <input type="checkbox" id="pcs2_flag" name="pcs2_flag" {{ "checked" if venue.pcs2_flag }}>
-  </div>
-  <div class="field">
-    <label for="pcs2_venue_name">Pcs2 venue name</label><br>
-    <input type="text" id="pcs2_venue_name" name="pcs2_venue_name" value="{{ venue.pcs2_venue_name or '' }}">
-  </div>
-  <div class="field">
-    <label for="sub_committee">Sub committee</label><br>
-    <input type="checkbox" id="sub_committee" name="sub_committee" {{ "checked" if venue.sub_committee }}>
-  </div>
-  <div class="field">
-    <label for="sub_committee_id">Sub committee ID</label><br>
-    <input type="text" id="sub_committee_id" name="sub_committee_id" value="{{ venue.sub_committee_id if venue.sub_committee_id is not none else 0 }}">
-  </div>
-  <div class="actions">
-    <button type="submit">{{ "Update Venue" if venue.id else "Create Venue" }}</button>
-  </div>
-</form>
+{% block scripts %}
+<script>
+  // Pull the venue name out of a pasted PCS address, and check fields as they're edited.
+  (function () {
+    var form = document.querySelector(".venue-form form");
+    var pcsName = document.getElementById("pcs2_venue_name");
 
-{% if venue.id %}
-<a href="{{ url_for('main.venue', venue_id=venue.id) }}">Show</a>
-{% endif %}
+    pcsName.addEventListener("input", function () {
+      var match = pcsName.value.match(/precisionconference\.com\/+~?([^\/?#\s]+)/i);
+      if (match) pcsName.value = match[1];
+    });
+    pcsName.addEventListener("blur", function () {
+      pcsName.value = pcsName.value.trim().toLowerCase();
+    });
+
+    function message(input) {
+      if (input.id === "name") return "Enter a name for your meeting.";
+      if (input.validity.valueMissing) return "Enter your PCS venue name.";
+      return "\u201c" + input.value + "\u201d doesn't look like a PCS venue name. " +
+        "It's usually a few letters, two digits and a letter, like chi27a.";
+    }
+
+    // Only called on submit, and then as flagged fields are edited, so an error
+    // message never shifts the layout under a click.
+    function showError(input) {
+      var group = input.closest(".form-group");
+      var id = input.id + "-error";
+      var error = document.getElementById(id);
+      var valid = input.checkValidity();
+      group.classList.toggle("has-error", !valid);
+      if (valid) {
+        if (error) error.remove();
+        return true;
+      }
+      if (!error) {
+        error = document.createElement("p");
+        error.className = "help-block field-error";
+        error.id = id;
+        group.appendChild(error);
+        input.setAttribute("aria-describedby", input.getAttribute("aria-describedby") + " " + id);
+      }
+      error.textContent = message(input);
+      return false;
+    }
+
+    var fields = [document.getElementById("name"), pcsName];
+    fields.forEach(function (input) {
+      input.addEventListener("input", function () {
+        if (input.closest(".form-group").classList.contains("has-error")) showError(input);
+      });
+    });
+
+    form.addEventListener("submit", function (event) {
+      pcsName.value = pcsName.value.trim().toLowerCase();
+      var firstInvalid = null;
+      fields.forEach(function (input) {
+        if (!showError(input) && !firstInvalid) firstInvalid = input;
+      });
+      if (firstInvalid) {
+        event.preventDefault();
+        firstInvalid.focus();
+      }
+    });
+  })();
+</script>
 {% endblock %}

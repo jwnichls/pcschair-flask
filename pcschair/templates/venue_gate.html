@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="venue-form">
+  <h1>Create a venue</h1>
+
+  <p class="lead">
+    Before you set up a venue for your program committee meeting, please answer
+    one question about your conference.
+  </p>
+
+  <form method="post" action="{{ url_for('main.check_sponsor_answer') }}">
+    <div class="form-group {{ 'has-error' if wrong }}">
+      <label class="control-label" for="answer">What entity sponsors and takes financial responsibility for your conference?</label>
+      <input type="text" class="form-control sponsor-input" id="answer" name="answer" value="{{ answer or '' }}"
+             required autofocus autocomplete="off"
+             {% if wrong %}aria-invalid="true" aria-describedby="answer-error"{% endif %}>
+      {% if wrong %}
+      <p class="help-block field-error" id="answer-error">
+        That answer wasn't recognized. If you think it should be, please
+        <a href="mailto:jeff@jeffreynichols.com">email Jeff</a>.
+      </p>
+      {% endif %}
+    </div>
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">Continue</button>
+      <a class="btn btn-link" href="{{ url_for('main.index') }}">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

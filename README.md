@@ -30,7 +30,12 @@ uv run python app.py        # http://localhost:3000 (the port the extension matc
 uv run pytest
 ```
 
-Create a venue at `/venues/new`. Attendees use `/venues/<id>`, and the chair uses `/venues/<id>/admin`.
+Anyone can create a venue at `/venues/new` (linked from the front page); creating one
+leads to its chair page. If `VENUE_SPONSOR_ANSWERS` is set, the form first asks what
+entity sponsors the conference and accepts any of those comma-separated one-word answers
+(case-insensitive; "the ACM" matches "ACM"). Attendees use `/venues/<id>`, and the chair uses `/venues/<id>/admin`.
+The list of all venues at `/venues` asks for the username and password in
+`VENUES_USERNAME` and `VENUES_PASSWORD`, and it's disabled unless both are set.
 
 SQLite (`instance/pcschair.db`) is used by default.
 
@@ -68,7 +73,7 @@ the extension does. Load increases in steps, and each step reports:
 
 ```sh
 uv run --group stress python stress/stress.py \
-  --url https://pcschair-staging-e00ae72137b0.herokuapp.com \
+  --url https://<staging-app>.herokuapp.com \
   --venues 22 --steps 100,250,500,750,1000,1500 --output results.json
 ```
 
@@ -84,6 +89,8 @@ behind means the measuring machine, not the server, was the bottleneck.
 | --- | --- |
 | `DATABASE_URL` | Database URL, e.g. `postgres://...` |
 | `SECRET_KEY` | Flask session secret (used for flash messages) |
+| `VENUES_USERNAME`, `VENUES_PASSWORD` | Login for the venue list at `/venues` (the list is off unless both are set) |
+| `VENUE_SPONSOR_ANSWERS` | Comma-separated one-word answers to the sponsor question asked before creating a venue, e.g. `ACM,IEEE` (no question if unset) |
 | `SOCKETIO_MESSAGE_QUEUE` | Redis URL, needed only when running more than one server process (`--extra redis`) |
 
 ## Deployment

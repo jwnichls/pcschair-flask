@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Venues</h1>
+
+{% with messages = get_flashed_messages() %}
+{% if messages %}<p id="notice">{{ messages | join(" ") }}</p>{% endif %}
+{% endwith %}
+
+<p><a href="{{ url_for('main.new_venue') }}">New venue</a> &middot; {{ venues | length }} venues, newest first</p>
+
+<div class="table-responsive">
+<table class="table venue-table">
+  <thead>
+    <tr>
+      <th scope="col">Name</th>
+      <th scope="col">PCS venue</th>
+      <th scope="col">Status</th>
+      <th scope="col">Created</th>
+      <th scope="col"><span class="sr-only">Actions</span></th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for venue in venues %}
+    <tr>
+      <td><a href="{{ url_for('main.venue', venue_id=venue.id) }}">{{ venue.name or "(unnamed)" }}</a></td>
+      <td>{{ venue.pcs2_venue_name or "" }}{% if venue.sub_committee %} <span class="text-muted">(subcommittee {{ venue.sub_committee_id if venue.sub_committee_id and venue.sub_committee_id > 0 else "not set" }})</span>{% endif %}</td>
+      <td>{{ "On break" if venue.breaktime else "Active" }}</td>
+      <td>{{ venue.created_at.strftime("%Y-%m-%d") if venue.created_at }}</td>
+      <td class="venue-actions">
+        <a href="{{ url_for('main.admin', venue_id=venue.id) }}">Chair</a>
+        <a href="{{ url_for('main.edit_venue', venue_id=venue.id) }}">Edit</a>
+        <form method="post" action="{{ url_for('main.delete_venue', venue_id=venue.id) }}"
+              data-confirm="Delete &ldquo;{{ venue.name or 'this venue' }}&rdquo; and its paper queue? This can't be undone."
+              onsubmit="return confirm(this.dataset.confirm);">
+          <button type="submit" class="btn btn-link btn-xs">Delete</button>
+        </form>
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% endblock %}
