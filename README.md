@@ -96,8 +96,12 @@ behind means the measuring machine, not the server, was the bottleneck.
 ## Deployment
 
 ```sh
-gunicorn --worker-class gevent --workers 1 --worker-connections 3000 --bind 0.0.0.0:$PORT app:app
+gunicorn --worker-class gevent --workers 1 --worker-connections 3000 --graceful-timeout 5 --bind 0.0.0.0:$PORT app:app
 ```
+
+`--graceful-timeout 5` keeps restarts short: open websockets never close on their own,
+so without it each restart waits out Heroku's 30-second shutdown limit (R12 errors),
+and pages reconnect once the new process is up.
 
 One gevent worker holds thousands of websockets in a single process (the threaded worker hit Heroku's per-dyno thread limit at about 100 users). To run
 multiple workers or dynos, set `SOCKETIO_MESSAGE_QUEUE` to a Redis URL so broadcasts
